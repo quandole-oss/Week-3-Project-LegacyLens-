@@ -75,7 +75,7 @@ class TestUpsertToPinecone:
         upsert_to_pinecone(mock_index, embedded)
 
         upserted = mock_index.upsert.call_args[1]["vectors"]
-        assert len(upserted[0]["metadata"]["text"]) == 40000
+        assert len(upserted[0]["metadata"]["text"]) == 35000
 
     def test_metadata_fields_capped(self):
         mock_index = MagicMock()

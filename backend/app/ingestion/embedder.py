@@ -27,6 +27,7 @@ def embed_chunks(
     for i in range(0, len(chunks), batch_size):
         batch = chunks[i:i + batch_size]
         texts = [chunk.embedding_text() for chunk in batch]
+        current_batch_size = len(batch)
 
         for attempt in range(max_retries):
             try:
@@ -35,7 +36,17 @@ def embed_chunks(
                     results.append((chunk, vector))
                 break
             except Exception as e:
-                if attempt < max_retries - 1:
+                err_str = str(e)
+                # Token limit exceeded — split batch in half and retry
+                if "max_tokens_per_request" in err_str and current_batch_size > 1:
+                    print(f"Batch too large ({current_batch_size} chunks). Splitting in half...")
+                    mid = len(batch) // 2
+                    first_half = embed_chunks(batch[:mid], batch_size=max(1, current_batch_size // 2), max_retries=max_retries)
+                    second_half = embed_chunks(batch[mid:], batch_size=max(1, current_batch_size // 2), max_retries=max_retries)
+                    results.extend(first_half)
+                    results.extend(second_half)
+                    break
+                elif attempt < max_retries - 1:
                     wait = 2 ** attempt
                     print(f"Embedding error (attempt {attempt + 1}): {e}. Retrying in {wait}s...")
                     time.sleep(wait)

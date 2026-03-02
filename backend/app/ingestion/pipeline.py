@@ -77,7 +77,7 @@ def upsert_to_pinecone(
     vectors = []
     for chunk, embedding in embedded_chunks:
         meta = {
-            "text": chunk.text[:40000],  # Pinecone metadata limit
+            "text": chunk.text[:35000],  # Pinecone 40KB metadata limit (leave room for other fields)
             "file_path": chunk.file_path,
             "routine_name": chunk.routine_name,
             "routine_type": chunk.routine_type,
