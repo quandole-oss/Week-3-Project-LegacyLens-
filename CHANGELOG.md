@@ -4,6 +4,29 @@ All notable changes to this project are documented here. Format follows [Keep a 
 
 ---
 
+## [0.3.1] - 2026-03-02
+
+Comprehensive test coverage sprint — nearly doubled total test count.
+
+### Tests Added
+
+- **test_scanner.py** (NEW, 12 tests): `detect_language` for all extensions, `count_lines` edge cases (empty, nonexistent), `scan_directory` with temp dirs (Fortran discovery, non-Fortran exclusion, TESTING dir filtering, BLAS/SRC scanning, sorted output, SourceFile field validation)
+- **test_embedder.py** (NEW, 8 tests): `get_embeddings_model` config wiring, `embed_chunks` single/multi-batch, retry on failure, max_retries exhaustion, empty chunks, exponential backoff timing verification
+- **test_pipeline.py** (NEW, 10 tests): `read_file_content` UTF-8 and latin-1 fallback, `chunk_all_files` routine + summary chunks, `upsert_to_pinecone` metadata truncation (40K text, 1K fields), batch sizing (250→3 calls), `create_pinecone_index` create/skip logic, `run_ingestion` full orchestration
+- **test_dependencies.py** (NEW, 10 tests): `CALL_PATTERN` and `EXTERNAL_PATTERN` regex matching, `extract_dependencies` from DGESV sample (sorted, uppercased), empty code, case insensitivity, `map_dependencies` SSE event sequence, error on no results, graph key validation
+- **test_features.py** (NEW, 12 tests): `stream_explanation` sources/tokens/done sequence, source count limit (≤5), required fields validation; `stream_documentation` and `stream_business_logic` SSE events; `find_similar_patterns` grouping by routine_type, results/done events, totals, empty results
+- **test_llm.py** (NEW, 8 tests): `get_llm` ChatAnthropic config, `get_query_chain` returns runnable, `stream_query_response` with/without prefetched results, `generate_answer` dict structure, `explain_code` and `generate_docs` token streaming
+- **test_search_result.py** (NEW, 6 tests): `SearchResult.to_dict` all fields + score rounding, `CodeSearcher.__init__` wiring, `_embed_query` cache miss/hit behavior, `search` Pinecone response parsing
+- **test_api.py** (EXPANDED, +15 tests): `/api/stats` mocked Pinecone stats, `/api/file-context` valid/404/traversal-blocked, `/api/smart-query` explain→SSE and search→JSON routing, `/api/explain`, `/api/docgen`, `/api/patterns`, `/api/dependencies`, `/api/business-logic` SSE responses, `/api/query` with reranker and query expansion
+- **QueryInput.test.tsx** (NEW, 9 tests): render, disabled states, form submission with trimming, example buttons, loading state, custom placeholder
+- **SourceCard.test.tsx** (NEW, 10 tests): score badge colors (green/yellow/gray), expand/collapse toggle, syntax highlighting, context loading, error display, snippet toggle
+- **Header.test.tsx** (NEW, 5 tests): title/badge render, stats fetch on mount, formatted vector count, rejection handling
+- **api.test.ts** (EXPANDED, +6 tests): `searchCode` POST/error, `getStats` GET/error, `getFileContext` params/defaults
+
+**Total test count**: 171 backend + 53 frontend = **224 tests** (up from 113)
+
+---
+
 ## [0.3.0] - 2026-03-02
 
 Phase 2 completion and Phase 3 performance/observability features.

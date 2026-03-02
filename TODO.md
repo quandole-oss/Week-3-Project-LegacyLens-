@@ -88,6 +88,22 @@
 - [x] Backend: test_chunker.py additions — 10 tests (COMMON/INCLUDE patterns, file summary chunks)
 - [x] Total: 90 backend tests, 23 frontend tests (113 total)
 
+## Test Coverage Sprint (v0.3.1)
+
+- [x] Backend: test_scanner.py — 12 tests (detect_language, count_lines, scan_directory, SourceFile fields)
+- [x] Backend: test_embedder.py — 8 tests (get_embeddings_model, batch embedding, retry, backoff)
+- [x] Backend: test_pipeline.py — 10 tests (read_file_content, chunk_all_files, upsert batching, create_pinecone_index, run_ingestion)
+- [x] Backend: test_dependencies.py — 10 tests (CALL/EXTERNAL patterns, extract_dependencies, map_dependencies)
+- [x] Backend: test_features.py — 12 tests (explain, docgen, patterns, business streaming)
+- [x] Backend: test_llm.py — 8 tests (get_llm, chains, stream_query_response, generate_answer, explain_code, generate_docs)
+- [x] Backend: test_search_result.py — 6 tests (SearchResult.to_dict, CodeSearcher init/embed/search)
+- [x] Backend: test_api.py expanded — 15 new tests (stats, file-context, smart-query, feature endpoints, reranker, expansion)
+- [x] Frontend: QueryInput.test.tsx — 9 tests (render, submit, examples, loading, placeholder)
+- [x] Frontend: SourceCard.test.tsx — 10 tests (badges, expand/collapse, context loading, error handling)
+- [x] Frontend: Header.test.tsx — 5 tests (title, stats fetch, error handling)
+- [x] Frontend: api.test.ts expanded — 6 new tests (searchCode, getStats, getFileContext)
+- [x] Total: 171 backend + 53 frontend = 224 tests (up from 113)
+
 ## Remaining (Requires User Action)
 
 - [ ] Clone LAPACK data and run ingestion pipeline
