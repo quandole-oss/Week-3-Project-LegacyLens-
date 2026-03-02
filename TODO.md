@@ -104,6 +104,13 @@
 - [x] Frontend: api.test.ts expanded — 6 new tests (searchCode, getStats, getFileContext)
 - [x] Total: 171 backend + 53 frontend = 224 tests (up from 113)
 
+## CI & Deployment Prep (v0.3.2)
+
+- [x] GitHub Actions CI workflow (`.github/workflows/ci.yml`) — backend pytest + frontend vitest + build on push/PR
+- [x] Frontend: App.test.tsx — 11 tests (render, tab switching, streaming query, search, errors, state clearing)
+- [x] Vercel deployment config (`frontend/vercel.json`) — SPA routing, Vite framework
+- [x] Total: 171 backend + 64 frontend = 235 tests
+
 ## Remaining (Requires User Action)
 
 - [ ] Clone LAPACK data and run ingestion pipeline

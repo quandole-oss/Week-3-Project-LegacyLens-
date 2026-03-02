@@ -4,6 +4,20 @@ All notable changes to this project are documented here. Format follows [Keep a 
 
 ---
 
+## [0.3.2] - 2026-03-02
+
+CI pipeline, App integration tests, and deployment configuration.
+
+### Added
+
+- **GitHub Actions CI** (`.github/workflows/ci.yml`): Runs on push/PR to main. Two parallel jobs: backend (Python 3.12, pytest 171 tests) and frontend (Node 20, vitest 64 tests + TypeScript build verification). All API keys set to empty strings for test isolation.
+- **App.test.tsx** (NEW, 11 tests): Integration tests for the main App component — renders header/tabs/input, tab switching with placeholder updates, streaming query flow (sources + tokens), search tab with `searchCode`, error handling (thrown errors + SSE error events), state clearing between queries, structured data events (dependencies/patterns).
+- **Vercel deployment config** (`frontend/vercel.json`): SPA rewrites for client-side routing, Vite framework auto-detection, `dist/` output directory.
+
+**Total test count**: 171 backend + 64 frontend = **235 tests**
+
+---
+
 ## [0.3.1] - 2026-03-02
 
 Comprehensive test coverage sprint — nearly doubled total test count.
