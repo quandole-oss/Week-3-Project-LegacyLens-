@@ -4,6 +4,24 @@ All notable changes to this project are documented here. Format follows [Keep a 
 
 ---
 
+## [0.3.3] - 2026-03-02
+
+Full ingestion, production deployment, and production fixes.
+
+### Added
+
+- **LAPACK Ingestion Complete**: 2306 Fortran files scanned → 4620 chunks created → 4620 vectors stored in Pinecone serverless index
+- **Railway Deployment**: Backend deployed at `https://week-3-project-legacylens-production.up.railway.app/` with all 6 environment variables configured
+- **Vercel Deployment**: Frontend deployed at `https://legacylens-murex.vercel.app/` with `VITE_API_URL` pointing to Railway backend
+- **CORS Production Origin**: Added `https://legacylens-murex.vercel.app` to allowed CORS origins in `backend/app/config.py`
+
+### Fixed
+
+- **Adaptive Batch Splitting** (`backend/app/ingestion/embedder.py`): When OpenAI's `max_tokens_per_request` limit is exceeded, the embedder now recursively halves the batch size instead of retrying the same oversized batch. Handles large LAPACK routines (e.g., 3000+ line files) that exceed the 300K token limit at batch_size=100
+- **Pinecone Metadata Size** (`backend/app/ingestion/pipeline.py`): Reduced text field truncation from 40,000 to 35,000 characters to stay safely under Pinecone's 40KB per-vector metadata limit. Previously caused `metadata size of 41108 exceeds 40960` errors on large routines
+
+---
+
 ## [0.3.2] - 2026-03-02
 
 CI pipeline, App integration tests, and deployment configuration.

@@ -111,17 +111,27 @@
 - [x] Vercel deployment config (`frontend/vercel.json`) — SPA routing, Vite framework
 - [x] Total: 171 backend + 64 frontend = 235 tests
 
+## Ingestion & Deployment (v0.3.3)
+
+- [x] Configure `.env` with real API keys (OpenAI, Anthropic, Pinecone)
+- [x] Run full LAPACK ingestion pipeline: 2306 files → 4620 chunks → 4620 vectors in Pinecone
+- [x] Fix adaptive batch splitting in embedder — recursive halving on OpenAI `max_tokens_per_request` error
+- [x] Fix Pinecone metadata size — reduce text cap from 40000 to 35000 chars (stay under 40KB limit)
+- [x] Verify end-to-end locally: search returns real LAPACK results, query generates Claude explanations
+- [x] Deploy backend to Railway (https://week-3-project-legacylens-production.up.railway.app/)
+- [x] Configure Railway environment variables (6 vars: OpenAI, Anthropic, Pinecone keys + index config)
+- [x] Deploy frontend to Vercel (https://legacylens-murex.vercel.app/)
+- [x] Configure Vercel `VITE_API_URL` environment variable pointing to Railway
+- [x] Add Vercel domain to CORS origins in `backend/app/config.py`
+- [x] Health check endpoint verified on Railway (`/health` → `{"status":"healthy"}`)
+- [x] Search endpoint verified on Railway (`/api/search` → real LAPACK results)
+
 ## Remaining (Requires User Action)
 
-- [ ] Clone LAPACK data and run ingestion pipeline
-- [ ] Set up .env with real API keys and verify end-to-end locally
-- [ ] Test all 6 query scenarios from the PDF specification
+- [ ] Test all 7 tabs on deployed app (Ask, Search, Explain, Docs, Deps, Patterns, Logic)
+- [ ] Test 6 query scenarios from spec (entry point, dependencies, explain, I/O, patterns, error handling)
 - [ ] Measure precision@5 (target >70%)
 - [ ] Document failure modes with real examples
-- [ ] Deploy backend to Railway
-- [ ] Deploy frontend to Vercel (set VITE_API_URL)
-- [ ] Add CORS origin for Vercel domain in config
-- [ ] Health check endpoint verification on deployed backend
-- [ ] End-to-end test: deployed frontend -> Railway -> Pinecone -> streamed response
 - [ ] Record demo video (3-5 min)
 - [ ] Social post on X or LinkedIn tagging @GauntletAI
+- [ ] Push `.github/workflows/ci.yml` (requires GitHub token with `workflow` scope)
