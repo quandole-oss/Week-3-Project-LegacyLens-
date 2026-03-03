@@ -2,7 +2,6 @@ import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
 import fortran from "react-syntax-highlighter/dist/esm/languages/hljs/fortran";
 import terminalTheme from "../terminalTheme";
 import type { Source, SearchResult } from "../api";
-import { getFileContext } from "../api";
 import { useState } from "react";
 
 SyntaxHighlighter.registerLanguage("fortran", fortran);
@@ -15,38 +14,8 @@ interface Props {
 
 export default function SourceCard({ source, index, expanded = false }: Props) {
   const [isExpanded, setIsExpanded] = useState(expanded);
-  const [fullContext, setFullContext] = useState<string | null>(null);
-  const [contextLoading, setContextLoading] = useState(false);
-  const [contextStartLine, setContextStartLine] = useState(source.start_line);
   const snippet = "snippet" in source ? source.snippet : ("text" in source ? source.text : "");
   const score = source.score;
-
-  const handleLoadContext = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (fullContext) {
-      setFullContext(null);
-      return;
-    }
-    setContextLoading(true);
-    try {
-      const ctx = await getFileContext(
-        source.file_path,
-        source.start_line,
-        source.end_line,
-        50,
-      );
-      setFullContext(ctx.content);
-      setContextStartLine(ctx.start_line);
-    } catch {
-      setFullContext("// Failed to load file context");
-      setContextStartLine(1);
-    } finally {
-      setContextLoading(false);
-    }
-  };
-
-  const displayCode = fullContext ?? snippet;
-  const displayStartLine = fullContext ? contextStartLine : source.start_line;
 
   return (
     <div className="bg-terminal-black border border-terminal-border overflow-hidden font-mono">
@@ -85,24 +54,8 @@ export default function SourceCard({ source, index, expanded = false }: Props) {
           </span>
         </div>
       </div>
-      {isExpanded && displayCode && (
+      {isExpanded && snippet && (
         <div className="border-t border-terminal-border">
-          <div className="tui-row flex items-center justify-between bg-terminal-black border-b border-terminal-border">
-            <span className="text-xs text-phosphor uppercase">
-              {fullContext ? "FULL CONTEXT" : "MATCHED SNIPPET"}
-            </span>
-            <button
-              onClick={handleLoadContext}
-              disabled={contextLoading}
-              className="btn-bracket text-xs text-amber border border-terminal-border px-2 py-0 disabled:opacity-50"
-            >
-              {contextLoading
-                ? "[ LOADING... ]"
-                : fullContext
-                ? "[ SHOW SNIPPET ]"
-                : "[ VIEW FULL CONTEXT ]"}
-            </button>
-          </div>
           <SyntaxHighlighter
             language="fortran"
             style={terminalTheme}
@@ -115,9 +68,9 @@ export default function SourceCard({ source, index, expanded = false }: Props) {
               overflow: "auto",
             }}
             showLineNumbers
-            startingLineNumber={displayStartLine}
+            startingLineNumber={source.start_line}
           >
-            {displayCode}
+            {snippet}
           </SyntaxHighlighter>
         </div>
       )}
