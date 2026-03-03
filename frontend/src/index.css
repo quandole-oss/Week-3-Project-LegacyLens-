@@ -18,7 +18,7 @@ body {
   background: #000000;
   color: #39FF14;
   font-family: "VT323", "Courier New", Consolas, monospace;
-  text-shadow: 0 0 5px #39FF14;
+  text-shadow: 0 0 1px #39FF14;
 }
 
 *, *::before, *::after {
@@ -27,11 +27,11 @@ body {
 
 /* CRT glow utilities */
 .crt-glow {
-  text-shadow: 0 0 5px #39FF14, 0 0 10px rgba(57, 255, 20, 0.3);
+  text-shadow: 0 0 2px rgba(57, 255, 20, 0.5);
 }
 
 .crt-glow-amber {
-  text-shadow: 0 0 5px #FFB000, 0 0 10px rgba(255, 176, 0, 0.3);
+  text-shadow: 0 0 2px rgba(255, 176, 0, 0.5);
 }
 
 /* Blinking block cursor */
@@ -94,7 +94,7 @@ body {
 .terminal-prose h6 {
   color: #FFB000;
   text-transform: uppercase;
-  text-shadow: 0 0 5px #FFB000, 0 0 10px rgba(255, 176, 0, 0.3);
+  text-shadow: 0 0 2px rgba(255, 176, 0, 0.5);
   border-bottom: 1px solid #39FF14;
   padding-bottom: 0.25em;
   margin-top: 1em;
