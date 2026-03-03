@@ -45,34 +45,18 @@ describe("SourceCard", () => {
   });
 
   it("score > 0.8 renders green badge", () => {
-    const { container } = render(
-      <SourceCard source={{ ...baseSource, score: 0.85 }} index={0} />
-    );
-    const badge = container.querySelector(".bg-green-900");
-    expect(badge).toBeTruthy();
-    expect(badge?.textContent).toContain("85.0%");
+    render(<SourceCard source={{ ...baseSource, score: 0.85 }} index={0} />);
+    expect(screen.getByText("[85.0%]")).toBeTruthy();
   });
 
   it("score 0.6-0.8 renders yellow badge", () => {
-    const { container } = render(
-      <SourceCard source={{ ...baseSource, score: 0.7 }} index={0} />
-    );
-    const badge = container.querySelector(".bg-yellow-900");
-    expect(badge).toBeTruthy();
-    expect(badge?.textContent).toContain("70.0%");
+    render(<SourceCard source={{ ...baseSource, score: 0.7 }} index={0} />);
+    expect(screen.getByText("[70.0%]")).toBeTruthy();
   });
 
   it("score < 0.6 renders gray badge", () => {
-    const { container } = render(
-      <SourceCard source={{ ...baseSource, score: 0.5 }} index={0} />
-    );
-    // Gray badge — both the routine_type badge and score badge use bg-gray-700
-    // Find the one containing a percentage
-    const badges = container.querySelectorAll(".bg-gray-700");
-    const scoreBadge = Array.from(badges).find((b) =>
-      b.textContent?.includes("50.0%")
-    );
-    expect(scoreBadge).toBeTruthy();
+    render(<SourceCard source={{ ...baseSource, score: 0.5 }} index={0} />);
+    expect(screen.getByText("[50.0%]")).toBeTruthy();
   });
 
   it("click header toggles expand/collapse", () => {
@@ -110,7 +94,7 @@ describe("SourceCard", () => {
     });
 
     render(<SourceCard source={baseSource} index={0} expanded={true} />);
-    const contextBtn = screen.getByText("View full context");
+    const contextBtn = screen.getByText("[ VIEW FULL CONTEXT ]");
     fireEvent.click(contextBtn);
 
     await waitFor(() => {
@@ -124,7 +108,7 @@ describe("SourceCard", () => {
     mockGetFileContext.mockRejectedValue(new Error("Network error"));
 
     render(<SourceCard source={baseSource} index={0} expanded={true} />);
-    const contextBtn = screen.getByText("View full context");
+    const contextBtn = screen.getByText("[ VIEW FULL CONTEXT ]");
     fireEvent.click(contextBtn);
 
     await waitFor(() => {
@@ -146,15 +130,15 @@ describe("SourceCard", () => {
     render(<SourceCard source={baseSource} index={0} expanded={true} />);
 
     // Load full context
-    fireEvent.click(screen.getByText("View full context"));
+    fireEvent.click(screen.getByText("[ VIEW FULL CONTEXT ]"));
     await waitFor(() => {
-      expect(screen.getByText("Show snippet")).toBeTruthy();
+      expect(screen.getByText("[ SHOW SNIPPET ]")).toBeTruthy();
     });
 
     // Toggle back
-    fireEvent.click(screen.getByText("Show snippet"));
+    fireEvent.click(screen.getByText("[ SHOW SNIPPET ]"));
     await waitFor(() => {
-      expect(screen.getByText("View full context")).toBeTruthy();
+      expect(screen.getByText("[ VIEW FULL CONTEXT ]")).toBeTruthy();
     });
   });
 

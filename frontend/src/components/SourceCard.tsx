@@ -1,6 +1,6 @@
 import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
 import fortran from "react-syntax-highlighter/dist/esm/languages/hljs/fortran";
-import { atomOneDark } from "react-syntax-highlighter/dist/esm/styles/hljs";
+import terminalTheme from "../terminalTheme";
 import type { Source, SearchResult } from "../api";
 import { getFileContext } from "../api";
 import { useState } from "react";
@@ -49,75 +49,68 @@ export default function SourceCard({ source, index, expanded = false }: Props) {
   const displayStartLine = fullContext ? contextStartLine : source.start_line;
 
   return (
-    <div className="bg-gray-800 border border-gray-700 rounded-lg overflow-hidden">
+    <div className="bg-terminal-black border border-terminal-border overflow-hidden font-mono">
       <div
-        className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-gray-750"
+        className="tui-row flex items-center justify-between cursor-pointer border-b border-terminal-border hover:bg-terminal-green-muted/10"
         onClick={() => setIsExpanded(!isExpanded)}
       >
-        <div className="flex items-center gap-3">
-          <span className="text-xs font-mono bg-gray-700 text-gray-300 px-2 py-0.5 rounded">
+        <div className="flex items-center gap-2 min-w-0">
+          <span className="text-xs border border-terminal-border text-amber px-1 py-0 shrink-0">
             #{index + 1}
           </span>
-          <div>
-            <span className="text-sm font-medium text-indigo-400">
-              {source.routine_name}
-            </span>
-            <span className="text-xs text-gray-500 ml-2">
-              {source.file_path}:{source.start_line}-{source.end_line}
-            </span>
-          </div>
+          <span className="text-sm text-phosphor crt-glow truncate">
+            {source.routine_name}
+          </span>
+          <span className="text-xs text-phosphor-dim shrink-0">
+            {source.file_path}:{source.start_line}-{source.end_line}
+          </span>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-xs bg-gray-700 text-gray-400 px-2 py-0.5 rounded">
+        <div className="flex items-center gap-1 shrink-0">
+          <span className="text-xs border border-terminal-border text-phosphor px-1 py-0 uppercase">
             {source.routine_type}
           </span>
           <span
-            className={`text-xs px-2 py-0.5 rounded font-mono ${
+            className={`text-xs px-1 py-0 font-mono ${
               score > 0.8
-                ? "bg-green-900 text-green-300"
+                ? "text-phosphor crt-glow"
                 : score > 0.6
-                ? "bg-yellow-900 text-yellow-300"
-                : "bg-gray-700 text-gray-400"
+                ? "text-amber crt-glow-amber"
+                : "text-phosphor-dim"
             }`}
           >
-            {(score * 100).toFixed(1)}%
+            [{(score * 100).toFixed(1)}%]
           </span>
-          <svg
-            className={`w-4 h-4 text-gray-500 transition-transform ${isExpanded ? "rotate-180" : ""}`}
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
+          <span className="text-xs text-phosphor">
+            {isExpanded ? "[-]" : "[+]"}
+          </span>
         </div>
       </div>
       {isExpanded && displayCode && (
-        <div className="border-t border-gray-700">
-          <div className="flex items-center justify-between px-4 py-1.5 bg-gray-900/50">
-            <span className="text-xs text-gray-500">
-              {fullContext ? "Full context" : "Matched snippet"}
+        <div className="border-t border-terminal-border">
+          <div className="tui-row flex items-center justify-between bg-terminal-black border-b border-terminal-border">
+            <span className="text-xs text-phosphor uppercase">
+              {fullContext ? "FULL CONTEXT" : "MATCHED SNIPPET"}
             </span>
             <button
               onClick={handleLoadContext}
               disabled={contextLoading}
-              className="text-xs text-indigo-400 hover:text-indigo-300 disabled:text-gray-600 transition-colors"
+              className="btn-bracket text-xs text-amber border border-terminal-border px-2 py-0 disabled:opacity-50"
             >
               {contextLoading
-                ? "Loading..."
+                ? "[ LOADING... ]"
                 : fullContext
-                ? "Show snippet"
-                : "View full context"}
+                ? "[ SHOW SNIPPET ]"
+                : "[ VIEW FULL CONTEXT ]"}
             </button>
           </div>
           <SyntaxHighlighter
             language="fortran"
-            style={atomOneDark}
+            style={terminalTheme}
             customStyle={{
               margin: 0,
-              padding: "1rem",
+              padding: "0.5rem 0.75rem",
               fontSize: "0.8rem",
-              background: "#1a1b26",
+              background: "#000000",
               maxHeight: "400px",
               overflow: "auto",
             }}

@@ -7,15 +7,15 @@ beforeEach(() => {
 });
 
 describe("QueryInput", () => {
-  it("renders input field and Ask button", () => {
+  it("renders input field and SEARCH button", () => {
     render(<QueryInput onSubmit={() => {}} isLoading={false} />);
     expect(screen.getByPlaceholderText("Ask about LAPACK code...")).toBeTruthy();
-    expect(screen.getByText("Ask")).toBeTruthy();
+    expect(screen.getByText("[ SEARCH ]")).toBeTruthy();
   });
 
   it("submit button disabled when input is empty", () => {
     render(<QueryInput onSubmit={() => {}} isLoading={false} />);
-    const button = screen.getByText("Ask");
+    const button = screen.getByText("[ SEARCH ]");
     expect(button).toBeDisabled();
   });
 
@@ -23,8 +23,8 @@ describe("QueryInput", () => {
     render(<QueryInput onSubmit={() => {}} isLoading={true} />);
     const input = screen.getByPlaceholderText("Ask about LAPACK code...");
     fireEvent.change(input, { target: { value: "test query" } });
-    // Find the submit button - when loading, it shows "Thinking..."
-    const button = screen.getByText("Thinking...");
+    // Find the submit button - when loading, it shows "PROCESSING..."
+    const button = screen.getByText("PROCESSING...");
     expect(button.closest("button")).toBeDisabled();
   });
 
@@ -48,23 +48,23 @@ describe("QueryInput", () => {
 
   it("renders all 5 example query buttons", () => {
     render(<QueryInput onSubmit={() => {}} isLoading={false} />);
-    expect(screen.getByText("What does DGESV do?")).toBeTruthy();
-    expect(screen.getByText("How does LU decomposition work in LAPACK?")).toBeTruthy();
-    expect(screen.getByText("Find routines that solve eigenvalue problems")).toBeTruthy();
-    expect(screen.getByText("Explain the BLAS matrix multiplication routine")).toBeTruthy();
-    expect(screen.getByText("What are the dependencies of DGEEV?")).toBeTruthy();
+    expect(screen.getByText(/What does DGESV do\?/)).toBeTruthy();
+    expect(screen.getByText(/How does LU decomposition work in LAPACK\?/)).toBeTruthy();
+    expect(screen.getByText(/Find routines that solve eigenvalue problems/)).toBeTruthy();
+    expect(screen.getByText(/Explain the BLAS matrix multiplication routine/)).toBeTruthy();
+    expect(screen.getByText(/What are the dependencies of DGEEV\?/)).toBeTruthy();
   });
 
   it("clicking example button calls onSubmit immediately", () => {
     const handleSubmit = vi.fn();
     render(<QueryInput onSubmit={handleSubmit} isLoading={false} />);
-    fireEvent.click(screen.getByText("What does DGESV do?"));
+    fireEvent.click(screen.getByText(/What does DGESV do\?/));
     expect(handleSubmit).toHaveBeenCalledWith("What does DGESV do?");
   });
 
   it("example buttons disabled when isLoading", () => {
     render(<QueryInput onSubmit={() => {}} isLoading={true} />);
-    const exampleButton = screen.getByText("What does DGESV do?");
+    const exampleButton = screen.getByText(/What does DGESV do\?/);
     expect(exampleButton).toBeDisabled();
   });
 

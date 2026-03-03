@@ -15,19 +15,19 @@ describe("AnswerPanel", () => {
     expect(screen.getByText(/DGESV solves a linear system/)).toBeTruthy();
   });
 
-  it("shows 'Answer' heading", () => {
+  it("shows '=== OUTPUT ===' heading", () => {
     render(<AnswerPanel answer="Some answer" isStreaming={false} />);
-    expect(screen.getByText("Answer")).toBeTruthy();
+    expect(screen.getByText("=== OUTPUT ===")).toBeTruthy();
   });
 
   it("shows streaming indicator when isStreaming is true", () => {
     render(<AnswerPanel answer="Partial..." isStreaming={true} />);
-    expect(screen.getByText("Generating...")).toBeTruthy();
+    expect(screen.getByText("GENERATING...")).toBeTruthy();
   });
 
   it("hides streaming indicator when isStreaming is false", () => {
     render(<AnswerPanel answer="Complete answer" isStreaming={false} />);
-    expect(screen.queryByText("Generating...")).toBeNull();
+    expect(screen.queryByText("GENERATING...")).toBeNull();
   });
 
   it("renders markdown content", () => {

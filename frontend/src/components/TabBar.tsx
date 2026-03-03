@@ -21,18 +21,18 @@ interface Props {
 
 export default function TabBar({ activeTab, onTabChange }: Props) {
   return (
-    <div className="flex flex-wrap gap-1 bg-gray-800 p-1 rounded-lg border border-gray-700">
+    <div className="flex flex-wrap gap-0 border border-terminal-border font-mono">
       {TABS.map((tab) => (
         <button
           key={tab.id}
           onClick={() => onTabChange(tab.id)}
-          className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+          className={`border-r border-terminal-border last:border-r-0 px-3 py-2 text-sm uppercase font-mono transition-colors ${
             activeTab === tab.id
-              ? "bg-indigo-600 text-white"
-              : "text-gray-400 hover:text-gray-200 hover:bg-gray-700"
+              ? "bg-phosphor text-terminal-black"
+              : "text-phosphor bg-transparent hover:bg-phosphor hover:text-terminal-black"
           }`}
         >
-          {tab.label}
+          {activeTab === tab.id ? `[ ${tab.label.toUpperCase()} ]` : `+ ${tab.label.toUpperCase()} +`}
         </button>
       ))}
     </div>

@@ -85,7 +85,7 @@ describe("App", () => {
 
   it("shows empty state when no query submitted", () => {
     render(<App />);
-    expect(screen.getByText("Explore LAPACK Legacy Code")).toBeTruthy();
+    expect(screen.getByText(/EXPLORE LAPACK LEGACY CODE/)).toBeTruthy();
   });
 
   it("defaults to query tab", () => {
@@ -134,7 +134,7 @@ describe("App", () => {
     fireEvent.click(screen.getByTestId("submit"));
 
     await waitFor(() => {
-      expect(screen.getByText("Results (1)")).toBeTruthy();
+      expect(screen.getByText(/RESULTS \(1\)/)).toBeTruthy();
       expect(screen.getByTestId("source-card-0")).toBeTruthy();
     });
   });
@@ -171,7 +171,7 @@ describe("App", () => {
       expect(screen.getByTestId("answer-text").textContent).toBe(
         "DGESV solves linear systems."
       );
-      expect(screen.getByText("Sources (1)")).toBeTruthy();
+      expect(screen.getByText(/SOURCES \(1\)/)).toBeTruthy();
       expect(screen.getByTestId("source-card-0")).toBeTruthy();
     });
   });
@@ -190,7 +190,7 @@ describe("App", () => {
     fireEvent.click(screen.getByTestId("submit"));
 
     await waitFor(() => {
-      expect(screen.getByText("Network timeout")).toBeTruthy();
+      expect(screen.getByText(/Network timeout/)).toBeTruthy();
     });
   });
 
@@ -209,7 +209,7 @@ describe("App", () => {
     fireEvent.click(screen.getByTestId("submit"));
 
     await waitFor(() => {
-      expect(screen.getByText("No matching routines found")).toBeTruthy();
+      expect(screen.getByText(/No matching routines found/)).toBeTruthy();
     });
   });
 

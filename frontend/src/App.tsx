@@ -96,7 +96,7 @@ function App() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
+    <div className="min-h-screen bg-terminal-black text-phosphor font-mono">
       <Header />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
         <div className="space-y-6">
@@ -108,8 +108,8 @@ function App() {
           />
 
           {error && (
-            <div className="bg-red-900/50 border border-red-700 text-red-300 px-4 py-3 rounded-lg">
-              {error}
+            <div className="border border-amber text-amber px-3 py-2 font-mono uppercase crt-glow-amber">
+              *** ERROR *** {error}
             </div>
           )}
 
@@ -127,8 +127,8 @@ function App() {
 
           {sources.length > 0 && (
             <div className="space-y-3">
-              <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wide">
-                Sources ({sources.length})
+              <h3 className="text-sm text-amber uppercase tracking-wide crt-glow-amber">
+                === SOURCES ({sources.length}) ===
               </h3>
               {sources.map((source, i) => (
                 <SourceCard key={`${source.file_path}-${source.routine_name}`} source={source} index={i} />
@@ -138,8 +138,8 @@ function App() {
 
           {searchResults.length > 0 && (
             <div className="space-y-3">
-              <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wide">
-                Results ({searchResults.length})
+              <h3 className="text-sm text-amber uppercase tracking-wide crt-glow-amber">
+                === RESULTS ({searchResults.length}) ===
               </h3>
               {searchResults.map((result, i) => (
                 <SourceCard key={`${result.file_path}-${result.routine_name}-${i}`} source={result} index={i} expanded />
@@ -148,12 +148,19 @@ function App() {
           )}
 
           {!isLoading && !answer && !error && sources.length === 0 && searchResults.length === 0 && (
-            <div className="text-center py-20">
-              <div className="text-6xl mb-4 opacity-20">&#128269;</div>
-              <h2 className="text-xl font-semibold text-gray-400 mb-2">
-                Explore LAPACK Legacy Code
+            <div className="text-center py-16 font-mono">
+              <pre className="text-phosphor crt-glow text-xs sm:text-sm mb-4 inline-block text-left">
+{` _                                _
+| |    ___  __ _  __ _  ___ _   _| |    ___ _ __  ___
+| |   / _ \\/ _\` |/ _\` |/ __| | | | |   / _ \\ '_ \\/ __|
+| |__|  __/ (_| | (_| | (__| |_| | |__|  __/ | | \\__ \\
+|_____\\___|\\__, |\\__,_|\\___|\\__, |_____\\___|_| |_|___/
+           |___/            |___/`}
+              </pre>
+              <h2 className="text-lg text-amber crt-glow-amber mb-2 uppercase">
+                [ EXPLORE LAPACK LEGACY CODE ]
               </h2>
-              <p className="text-gray-500 max-w-lg mx-auto">
+              <p className="text-phosphor-dim max-w-lg mx-auto uppercase text-sm">
                 Ask questions about LAPACK routines, search for code patterns, generate documentation,
                 or explore dependencies. Try one of the example queries above to get started.
               </p>

@@ -1,6 +1,181 @@
 @import "tailwindcss";
 
+@theme {
+  --color-terminal-black: #000000;
+  --color-phosphor: #39FF14;
+  --color-phosphor-dim: #2bcc10;
+  --color-amber: #FFB000;
+  --color-amber-dim: #cc8d00;
+  --color-terminal-green-muted: #0d3305;
+  --color-terminal-border: #39FF14;
+  --color-terminal-border-dim: #0d3305;
+}
+
+/* Strict monochrome CRT: black bg, phosphor green / amber only */
 body {
   margin: 0;
   min-height: 100vh;
+  background: #000000;
+  color: #39FF14;
+  font-family: "VT323", "Courier New", Consolas, monospace;
+  text-shadow: 0 0 5px #39FF14;
+}
+
+*, *::before, *::after {
+  border-radius: 0 !important;
+}
+
+/* CRT glow utilities */
+.crt-glow {
+  text-shadow: 0 0 5px #39FF14, 0 0 10px rgba(57, 255, 20, 0.3);
+}
+
+.crt-glow-amber {
+  text-shadow: 0 0 5px #FFB000, 0 0 10px rgba(255, 176, 0, 0.3);
+}
+
+/* Blinking block cursor */
+.blink-cursor {
+  animation: blink-step 1s step-end infinite;
+}
+
+@keyframes blink-step {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* Command-line input: no rounded corners, thin borders */
+.cmd-input {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid #39FF14;
+  outline: none;
+  caret-color: #39FF14;
+}
+
+.cmd-input::placeholder {
+  color: #0d3305;
+}
+
+/* Bracket buttons: raw text, invert on hover */
+.btn-bracket {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.btn-bracket:hover:not(:disabled) {
+  background: #39FF14;
+  color: #000000;
+}
+
+.btn-bracket-amber:hover:not(:disabled) {
+  background: #FFB000;
+  color: #000000;
+}
+
+/* Dense TUI table rows */
+.tui-row {
+  padding: 0.25rem 0.5rem;
+}
+
+/* Terminal prose — markdown override */
+.terminal-prose {
+  color: #39FF14;
+  font-family: "VT323", "Courier New", Consolas, monospace;
+  line-height: 1.5;
+}
+
+.terminal-prose h1,
+.terminal-prose h2,
+.terminal-prose h3,
+.terminal-prose h4,
+.terminal-prose h5,
+.terminal-prose h6 {
+  color: #FFB000;
+  text-transform: uppercase;
+  text-shadow: 0 0 5px #FFB000, 0 0 10px rgba(255, 176, 0, 0.3);
+  border-bottom: 1px solid #39FF14;
+  padding-bottom: 0.25em;
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+}
+
+.terminal-prose strong {
+  color: #FFB000;
+  font-weight: inherit;
+}
+
+.terminal-prose em {
+  color: #2bcc10;
+  font-style: normal;
+}
+
+.terminal-prose a {
+  color: #FFB000;
+  text-decoration: underline;
+}
+
+.terminal-prose ul,
+.terminal-prose ol {
+  color: #39FF14;
+  padding-left: 1.5em;
+}
+
+.terminal-prose li::marker {
+  color: #FFB000;
+}
+
+.terminal-prose p {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+.terminal-prose code {
+  background: #000000;
+  color: #FFB000;
+  border: 1px solid #39FF14;
+  padding: 0.1em 0.25em;
+  font-family: "VT323", "Courier New", Consolas, monospace;
+}
+
+.terminal-prose pre {
+  background: #000000;
+  border: 1px solid #39FF14;
+  padding: 0.5rem;
+  overflow-x: auto;
+}
+
+.terminal-prose pre code {
+  background: none;
+  border: none;
+  color: #39FF14;
+  padding: 0;
+}
+
+.terminal-prose blockquote {
+  border-left: 2px solid #FFB000;
+  padding-left: 0.75em;
+  color: #2bcc10;
+}
+
+.terminal-prose hr {
+  border-color: #39FF14;
+}
+
+.terminal-prose table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.terminal-prose th,
+.terminal-prose td {
+  border: 1px solid #39FF14;
+  padding: 0.25rem 0.5rem;
+  color: #39FF14;
+}
+
+.terminal-prose th {
+  color: #FFB000;
+  text-transform: uppercase;
 }

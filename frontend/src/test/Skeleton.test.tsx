@@ -15,8 +15,7 @@ describe("AnswerSkeleton", () => {
 
   it("renders placeholder lines", () => {
     const { container } = render(<AnswerSkeleton />);
-    // Should have multiple placeholder bars (bg-gray-700 rounded divs)
-    const bars = container.querySelectorAll(".bg-gray-700.rounded");
+    const bars = container.querySelectorAll(".skeleton-bar");
     expect(bars.length).toBeGreaterThanOrEqual(3);
   });
 });
@@ -24,13 +23,13 @@ describe("AnswerSkeleton", () => {
 describe("SourceSkeleton", () => {
   it("renders default 3 skeleton cards", () => {
     const { container } = render(<SourceSkeleton />);
-    const cards = container.querySelectorAll(".bg-gray-800");
+    const cards = container.querySelectorAll(".bg-terminal-black.border-terminal-border");
     expect(cards.length).toBe(3);
   });
 
   it("renders specified number of cards", () => {
     const { container } = render(<SourceSkeleton count={5} />);
-    const cards = container.querySelectorAll(".bg-gray-800");
+    const cards = container.querySelectorAll(".bg-terminal-black.border-terminal-border");
     expect(cards.length).toBe(5);
   });
 

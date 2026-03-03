@@ -23,8 +23,8 @@ describe("Header", () => {
 
     render(<Header />);
     expect(screen.getByText("Legacy")).toBeTruthy();
-    expect(screen.getByText("Lens")).toBeTruthy();
-    expect(screen.getByText("LAPACK Explorer")).toBeTruthy();
+    expect(screen.getByText(/Lens/)).toBeTruthy();
+    expect(screen.getByText(/LAPACK EXPLORER/)).toBeTruthy();
   });
 
   it("fetches stats on mount and displays formatted vector count", async () => {
@@ -36,7 +36,7 @@ describe("Header", () => {
 
     render(<Header />);
     await waitFor(() => {
-      expect(screen.getByText("5,000 vectors indexed")).toBeTruthy();
+      expect(screen.getByText(/5,000.*vectors indexed/i)).toBeTruthy();
     });
   });
 
@@ -68,7 +68,7 @@ describe("Header", () => {
 
     render(<Header />);
     await waitFor(() => {
-      expect(screen.getByText("12,345 vectors indexed")).toBeTruthy();
+      expect(screen.getByText(/12,345.*vectors indexed/i)).toBeTruthy();
     });
   });
 });

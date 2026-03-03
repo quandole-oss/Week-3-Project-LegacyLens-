@@ -1,16 +1,25 @@
 export function AnswerSkeleton() {
   return (
-    <div className="bg-gray-800 border border-gray-700 rounded-lg p-6 animate-pulse">
-      <div className="flex items-center gap-2 mb-4">
-        <div className="h-4 w-16 bg-gray-700 rounded" />
-        <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-pulse" />
+    <div className="bg-terminal-black border border-terminal-border p-3 font-mono">
+      <div className="tui-row flex items-center gap-2 mb-2 border-b border-terminal-border">
+        <h3 className="text-sm text-amber uppercase tracking-wide crt-glow-amber">
+          === OUTPUT ===
+        </h3>
       </div>
-      <div className="space-y-3">
-        <div className="h-3 bg-gray-700 rounded w-full" />
-        <div className="h-3 bg-gray-700 rounded w-5/6" />
-        <div className="h-3 bg-gray-700 rounded w-4/6" />
-        <div className="h-3 bg-gray-700 rounded w-full" />
-        <div className="h-3 bg-gray-700 rounded w-3/6" />
+      <div className="space-y-2 text-phosphor pt-2">
+        <div className="flex items-center gap-1 animate-pulse">
+          <span className="uppercase">Loading response</span>
+          <span className="blink-cursor inline-block w-2 h-4 bg-phosphor" />
+        </div>
+        <div className="text-phosphor-dim font-mono animate-pulse skeleton-bar">
+          ████████████████████████████████████████
+        </div>
+        <div className="text-phosphor-dim font-mono animate-pulse skeleton-bar">
+          ██████████████████████████████
+        </div>
+        <div className="text-phosphor-dim font-mono animate-pulse skeleton-bar">
+          ████████████████████
+        </div>
       </div>
     </div>
   );
@@ -18,24 +27,32 @@ export function AnswerSkeleton() {
 
 export function SourceSkeleton({ count = 3 }: { count?: number }) {
   return (
-    <div className="space-y-3">
-      <div className="h-4 w-24 bg-gray-700 rounded animate-pulse" />
+    <div className="space-y-0 font-mono">
+      <h3 className="text-sm text-amber uppercase tracking-wide crt-glow-amber mb-2">
+        === SOURCES ===
+      </h3>
       {Array.from({ length: count }).map((_, i) => (
         <div
           key={i}
-          className="bg-gray-800 border border-gray-700 rounded-lg overflow-hidden animate-pulse"
+          className="bg-terminal-black border border-terminal-border overflow-hidden animate-pulse"
         >
-          <div className="flex items-center justify-between px-4 py-3">
-            <div className="flex items-center gap-3">
-              <div className="h-5 w-6 bg-gray-700 rounded" />
-              <div className="space-y-1">
-                <div className="h-4 w-24 bg-gray-700 rounded" />
-                <div className="h-3 w-40 bg-gray-700 rounded" />
+          <div className="tui-row flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-xs border border-terminal-border text-amber px-1 py-0">
+                #{i + 1}
+              </span>
+              <div>
+                <div className="text-sm text-phosphor-dim uppercase">Loading...</div>
+                <div className="text-xs text-phosphor-dim">---</div>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="h-5 w-16 bg-gray-700 rounded" />
-              <div className="h-5 w-12 bg-gray-700 rounded" />
+            <div className="flex items-center gap-1">
+              <span className="text-xs border border-terminal-border text-phosphor-dim px-1 py-0 uppercase">
+                ---
+              </span>
+              <span className="text-xs text-phosphor-dim font-mono">
+                [--.--%]
+              </span>
             </div>
           </div>
         </div>
