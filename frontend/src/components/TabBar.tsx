@@ -9,7 +9,7 @@ const TABS: Tab[] = [
   { id: "search", label: "Search", icon: "S" },
   { id: "explain", label: "Explain", icon: "E" },
   { id: "docgen", label: "Docs", icon: "D" },
-  { id: "dependencies", label: "Deps", icon: "G" },
+
   { id: "patterns", label: "Patterns", icon: "P" },
   { id: "business", label: "Logic", icon: "L" },
 ];

@@ -9,14 +9,14 @@ import { streamQuery, searchCode } from "./api";
 import type { Source, SearchResult } from "./api";
 import "./index.css";
 
-type TabId = "query" | "search" | "explain" | "docgen" | "dependencies" | "patterns" | "business";
+type TabId = "query" | "search" | "explain" | "docgen" | "patterns" | "business";
 
 const TAB_ENDPOINTS: Record<TabId, string> = {
   query: "/api/query",
   search: "/api/search",
   explain: "/api/explain",
   docgen: "/api/docgen",
-  dependencies: "/api/dependencies",
+
   patterns: "/api/patterns",
   business: "/api/business-logic",
 };
@@ -26,7 +26,7 @@ const TAB_PLACEHOLDERS: Record<TabId, string> = {
   search: "Search for code (e.g., 'LU decomposition')...",
   explain: "Enter a routine name to explain (e.g., 'DGESV')...",
   docgen: "Enter a routine name to generate docs for...",
-  dependencies: "Enter a routine name to map dependencies...",
+
   patterns: "Describe a code pattern to find...",
   business: "Enter a routine to extract business logic from...",
 };
@@ -68,7 +68,6 @@ function App() {
               setAnswer(fullAnswer);
               break;
             case "patterns":
-            case "dependencies":
             case "graph":
               // For structured data, display as formatted JSON
               fullAnswer += "```json\n" + JSON.stringify(event.data, null, 2) + "\n```\n\n";
