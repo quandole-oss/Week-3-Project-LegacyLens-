@@ -1,5 +1,7 @@
 """Ingestion pipeline: scan -> chunk -> embed -> store in Pinecone."""
 
+import time
+
 from pinecone import Pinecone, ServerlessSpec
 from backend.app.config import get_settings
 from backend.app.ingestion.scanner import scan_directory, SourceFile
@@ -113,32 +115,65 @@ def run_ingestion(data_dir: str = None):
     print("LegacyLens Ingestion Pipeline")
     print("=" * 60)
 
+    t_start = time.perf_counter()
+
     # Step 1: Scan
     print("\n[1/4] Scanning for Fortran source files...")
+    t0 = time.perf_counter()
     files = scan_directory(data_dir)
+    t_scan = time.perf_counter() - t0
 
     # Step 2: Chunk
     print("\n[2/4] Chunking source files...")
+    t0 = time.perf_counter()
     chunks = chunk_all_files(files)
+    t_chunk = time.perf_counter() - t0
 
     # Step 3: Embed
     print("\n[3/4] Generating embeddings...")
+    t0 = time.perf_counter()
     embedded_chunks = embed_chunks(chunks, batch_size=settings.chunk_batch_size)
+    t_embed = time.perf_counter() - t0
 
     # Step 4: Store
     print("\n[4/4] Storing in Pinecone...")
+    t0 = time.perf_counter()
     index = create_pinecone_index(settings)
     upsert_to_pinecone(index, embedded_chunks)
+    t_upsert = time.perf_counter() - t0
+
+    total_time = time.perf_counter() - t_start
+    total_loc = sum(f.line_count for f in files)
+    loc_per_min = total_loc / (total_time / 60) if total_time > 0 else 0
 
     print("\n" + "=" * 60)
-    print(f"Ingestion complete!")
+    print("Ingestion complete!")
     print(f"  Files processed: {len(files)}")
     print(f"  Chunks created:  {len(chunks)}")
     print(f"  Vectors stored:  {len(embedded_chunks)}")
+    print(f"  Total LOC:       {total_loc:,}")
+    print()
+    print(f"  {'Stage':<12} {'Time (s)':>10}")
+    print(f"  {'-'*12} {'-'*10}")
+    print(f"  {'Scan':<12} {t_scan:>10.2f}")
+    print(f"  {'Chunk':<12} {t_chunk:>10.2f}")
+    print(f"  {'Embed':<12} {t_embed:>10.2f}")
+    print(f"  {'Upsert':<12} {t_upsert:>10.2f}")
+    print(f"  {'-'*12} {'-'*10}")
+    print(f"  {'Total':<12} {total_time:>10.2f}")
+    print()
+    print(f"  Throughput: {loc_per_min:,.0f} LOC/min")
     print("=" * 60)
 
     return {
         "files": len(files),
         "chunks": len(chunks),
         "vectors": len(embedded_chunks),
+        "total_loc": total_loc,
+        "t_scan": round(t_scan, 2),
+        "t_chunk": round(t_chunk, 2),
+        "t_embed": round(t_embed, 2),
+        "t_upsert": round(t_upsert, 2),
+        "total_time": round(total_time, 2),
+        "loc_per_min": round(loc_per_min, 0),
     }

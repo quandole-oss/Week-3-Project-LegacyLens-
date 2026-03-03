@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import time
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -29,10 +31,28 @@ from backend.app.features.patterns import find_similar_patterns
 from backend.app.features.dependencies import map_dependencies
 from backend.app.features.business import stream_business_logic
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Pre-warm the searcher on startup and optionally keep the container warm."""
+    get_searcher()
+    logger.info("Searcher pre-warmed")
+
+    async def _keep_alive():
+        while True:
+            await asyncio.sleep(300)
+            get_searcher()
+            logger.info("Keep-alive: searcher warm")
+
+    task = asyncio.create_task(_keep_alive())
+    yield
+    task.cancel()
+
+
 app = FastAPI(
     title="LegacyLens",
     description="RAG-powered legacy code understanding for LAPACK",
     version="1.0.0",
+    lifespan=lifespan,
 )
 
 settings = get_settings()
