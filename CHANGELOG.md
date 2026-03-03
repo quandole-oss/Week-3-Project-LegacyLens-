@@ -4,6 +4,56 @@ All notable changes to this project are documented here. Format follows [Keep a 
 
 ---
 
+## [0.4.0] - 2026-03-02
+
+Performance improvements, evaluation tooling, and UI polish.
+
+### Added
+
+- **Lifespan Pre-warm** (`backend/app/main.py`): FastAPI lifespan context manager calls `get_searcher()` at startup and logs "Searcher pre-warmed". Background keep-alive task re-warms every 5 minutes to prevent cold container timeouts
+- **Ingestion Timing** (`backend/app/ingestion/pipeline.py`): Per-stage timing (scan, chunk, embed, upsert) with formatted table output and LOC/min throughput metric. Return dict now includes `t_scan`, `t_chunk`, `t_embed`, `t_upsert`, `total_time`, `total_loc`, `loc_per_min`
+- **Precision Eval Reranked Mode** (`scripts/eval_precision.py`): `--reranked` flag queries `/api/query` (non-streaming) instead of `/api/search` to evaluate re-ranked results. `--both` runs baseline and reranked side-by-side with delta comparison. `--api-url` flag for custom API base URL
+- **Expanded Ground Truth** (`scripts/eval_precision.py`): DGESV query now includes `dgetrf`, `dgetrs`; DLANGE query now includes `dlassq`, `dcombssq`, `disnan`
+
+### Changed
+
+- **CRT Glow Reduced**: Body text-shadow from `5px` to `1px`, heading/label glow from `5px+10px` to `2px` at 50% opacity for crisp readability
+- **Code Comments Brightened**: Syntax highlighter comment color from `#1a5c0a` (near-invisible) to `#2bcc10` (readable dim green)
+
+### Removed
+
+- **Deps Tab**: Removed from frontend — dependencies endpoint returns empty call chains, not useful in current state
+- **FULL CONTEXT Button**: Removed from SourceCard — `/api/file-context` fails on Railway (no local LAPACK files). Snippet view still works
+
+### Performance
+
+- Warm query latency measured at **2.5s** (target: <3s)
+- Precision@5 baseline: **82%** (target: >70%)
+- 2,306 files / 4,620 vectors indexed (100% coverage)
+
+---
+
+## [0.3.5] - 2026-03-02
+
+Retro mainframe terminal UI overhaul — strict CSS/styling refactor only (no logic changes).
+
+### Changed
+
+- **Visual Aesthetic**: Complete overhaul to 1980s/1990s mainframe terminal style (brutalist, CRT)
+- **Color Palette**: Monochrome — pure black (#000000) background, phosphor green (#39FF14) and amber (#FFB000) only. No grays, whites, or gradients
+- **Typography**: Strict monospace everywhere (VT323, Courier New, Consolas)
+- **Shapes & Borders**: `border-radius: 0` globally; thin 1px solid borders on all panels
+- **Casing**: All navigation, tabs, and headers converted to UPPERCASE (Fortran 77 constraint mimic)
+- **QueryInput**: Command-line prompt style — `>` prefix, transparent input with bottom border only, `[ SEARCH ]` button, example buttons as `+ text +`
+- **TabBar**: Active tabs `[ LABEL ]` with phosphor background; inactive `+ LABEL +` with invert-on-hover
+- **Header**: `Legacy` (amber) + `Lens` (phosphor), `LAPACK EXPLORER` badge, `[ N VECTORS INDEXED ]` stats
+- **SourceCard**: Dense TUI rows, minimal padding, bracket-style buttons `[ VIEW FULL CONTEXT ]` / `[ SHOW SNIPPET ]`
+- **AnswerPanel & Skeleton**: Reduced padding, solid block cursor (`inline-block` with blink), uppercase labels (`GENERATING...`, `LOADING...`)
+- **index.css**: New `.cmd-input`, `.btn-bracket`, `.tui-row` utility classes; CRT glow (`text-shadow`) on body; denser terminal-prose tables
+- **Tests**: Updated 8 test files to match new UI text/structure (regex matchers for bracket-wrapped labels); all 64 frontend tests passing
+
+---
+
 ## [0.3.3] - 2026-03-02
 
 Full ingestion, production deployment, and production fixes.

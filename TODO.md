@@ -126,12 +126,45 @@
 - [x] Health check endpoint verified on Railway (`/health` → `{"status":"healthy"}`)
 - [x] Search endpoint verified on Railway (`/api/search` → real LAPACK results)
 
+## Final Validation (v0.3.4)
+
+- [x] Test all 7 backend endpoints via curl — all return HTTP 200 (Ask, Search, Explain, Docs, Deps, Patterns, Logic)
+- [x] Test 6 query scenarios from spec — 5/6 PASS (deps endpoint returns empty call chains)
+- [x] Measure precision@5 — **82% average** (target >70%) via `scripts/eval_precision.py`
+- [x] Document failure modes — 11 edge cases in `docs/failure-modes.md` (2 HIGH, 1 MEDIUM, 3 LOW, 5 NONE)
+- [x] Demo video script written (`docs/demo-script.md`)
+- [x] Social media posts drafted (`docs/social-posts.md`)
+- [x] CI workflow created (`.github/workflows/ci.yml`)
+
+## UI Overhaul (v0.3.5) — Completed
+
+- [x] Retro mainframe terminal aesthetic (1980s/1990s CRT style)
+- [x] Monochrome palette: pure black (#000000), phosphor green (#39FF14), amber (#FFB000)
+- [x] Strict monospace typography (VT323, Courier New, Consolas)
+- [x] Zero rounded corners, 1px solid borders throughout
+- [x] UPPERCASE for navigation, tabs, and headers (Fortran 77 constraint mimic)
+- [x] Command-line search bar: `>` prompt, minimal input border, block cursor when loading
+- [x] Bracket-style buttons: `[ SEARCH ]`, `+ LABEL +` with invert-on-hover (green bg, black text)
+- [x] Dense TUI-style result cards and code blocks
+- [x] CRT glow: subtle `text-shadow` on phosphor/amber text
+- [x] Update tests for new UI text and structure (64 frontend tests passing)
+
+## Performance & Polish (v0.4.0) — Completed
+
+- [x] FastAPI lifespan with searcher pre-warm at startup + 5-min keep-alive background task
+- [x] Per-stage ingestion timing (scan, chunk, embed, upsert) with LOC/min throughput reporting
+- [x] Precision eval `--reranked` mode using `/api/query` (non-streaming) with re-ranked sources
+- [x] Precision eval `--both` mode for side-by-side baseline vs reranked comparison
+- [x] Expanded ground truth: DGESV (+dgetrf, dgetrs), DLANGE (+dlassq, dcombssq, disnan)
+- [x] Reduced CRT glow for readability (text-shadow 5px→1-2px, brighter code comments)
+- [x] Removed broken Deps tab (dependencies endpoint returns empty call chains)
+- [x] Removed broken FULL CONTEXT button (`/api/file-context` fails on Railway — no local files)
+- [x] Deployed backend update to Railway via `railway up`
+- [x] Verified warm query latency <3s (2.5s measured)
+
 ## Remaining (Requires User Action)
 
-- [ ] Test all 7 tabs on deployed app (Ask, Search, Explain, Docs, Deps, Patterns, Logic)
-- [ ] Test 6 query scenarios from spec (entry point, dependencies, explain, I/O, patterns, error handling)
-- [ ] Measure precision@5 (target >70%)
-- [ ] Document failure modes with real examples
-- [ ] Record demo video (3-5 min)
-- [ ] Social post on X or LinkedIn tagging @GauntletAI
+- [ ] Test all 6 tabs in browser UI (visual verification)
+- [ ] Record demo video using `docs/demo-script.md` (3-5 min, QuickTime/OBS/Loom)
+- [ ] Post on X or LinkedIn using drafts from `docs/social-posts.md`, tag @GauntletAI
 - [ ] Push `.github/workflows/ci.yml` (requires GitHub token with `workflow` scope)
