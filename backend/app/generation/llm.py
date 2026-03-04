@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 from langchain_anthropic import ChatAnthropic
 from langchain_core.output_parsers import StrOutputParser
 
-from backend.app.config import get_settings
+from backend.app.config import get_settings, VerbosityProfile
 from backend.app.generation.prompts import (
     QUERY_TEMPLATE,
     EXPLAIN_TEMPLATE,
@@ -23,19 +23,29 @@ from backend.app.retrieval.search import CodeSearcher, SearchResult
 from backend.app.retrieval.context import assemble_context, format_sources
 
 
-def get_llm(streaming: bool = True):
+def get_llm(
+    streaming: bool = True,
+    model_override: str | None = None,
+    max_tokens_override: int | None = None,
+):
     settings = get_settings()
     return ChatAnthropic(
-        model=settings.generation_model,
+        model=model_override or settings.generation_model,
         anthropic_api_key=settings.anthropic_api_key,
         temperature=0,
         streaming=streaming,
-        max_tokens=4096,
+        max_tokens=max_tokens_override or 2048,
     )
 
 
-def get_query_chain():
-    return QUERY_TEMPLATE | get_llm() | StrOutputParser()
+def get_query_chain(
+    model_override: str | None = None,
+    max_tokens_override: int | None = None,
+):
+    return QUERY_TEMPLATE | get_llm(
+        model_override=model_override,
+        max_tokens_override=max_tokens_override,
+    ) | StrOutputParser()
 
 
 def get_explain_chain():
@@ -55,21 +65,46 @@ async def stream_query_response(
     searcher: CodeSearcher,
     top_k: int = 10,
     prefetched_results: list[SearchResult] | None = None,
+    profile: VerbosityProfile | None = None,
 ) -> AsyncIterator[str]:
     """Stream an answer to a code question with source references."""
     # Use pre-fetched results (e.g. from reranker) or search directly
     results = prefetched_results if prefetched_results is not None else searcher.search(question, top_k=top_k)
-    context = assemble_context(results)
+
+    # Assemble context with profile-driven trimming
+    if profile:
+        context = assemble_context(
+            results,
+            max_chunks=profile.max_chunks,
+            trim_after_rank=profile.trim_after_rank,
+            trim_char_limit=profile.trim_char_limit,
+        )
+    else:
+        context = assemble_context(results)
+
     sources = format_sources(results)
 
     # Send sources first as a JSON event
     yield f"data: {json.dumps({'type': 'sources', 'data': sources})}\n\n"
 
+    # Build the question with optional prompt suffix
+    effective_question = question
+    if profile and profile.prompt_suffix:
+        effective_question = f"{question}\n\n{profile.prompt_suffix}"
+
+    # Build chain with profile overrides
+    if profile:
+        chain = get_query_chain(
+            model_override=profile.generation_model,
+            max_tokens_override=profile.max_tokens,
+        )
+    else:
+        chain = get_query_chain()
+
     # Stream the LLM response with timing
-    chain = get_query_chain()
     token_count = 0
     t0 = time.perf_counter()
-    async for chunk in chain.astream({"context": context, "question": question}):
+    async for chunk in chain.astream({"context": context, "question": effective_question}):
         token_count += 1
         yield f"data: {json.dumps({'type': 'token', 'data': chunk})}\n\n"
 
@@ -87,14 +122,36 @@ async def generate_answer(
     searcher: CodeSearcher,
     top_k: int = 10,
     prefetched_results: list[SearchResult] | None = None,
+    profile: VerbosityProfile | None = None,
 ) -> dict:
     """Generate a non-streaming answer."""
     results = prefetched_results if prefetched_results is not None else searcher.search(question, top_k=top_k)
-    context = assemble_context(results)
+
+    if profile:
+        context = assemble_context(
+            results,
+            max_chunks=profile.max_chunks,
+            trim_after_rank=profile.trim_after_rank,
+            trim_char_limit=profile.trim_char_limit,
+        )
+    else:
+        context = assemble_context(results)
+
     sources = format_sources(results)
 
-    chain = get_query_chain()
-    answer = await chain.ainvoke({"context": context, "question": question})
+    effective_question = question
+    if profile and profile.prompt_suffix:
+        effective_question = f"{question}\n\n{profile.prompt_suffix}"
+
+    if profile:
+        chain = get_query_chain(
+            model_override=profile.generation_model,
+            max_tokens_override=profile.max_tokens,
+        )
+    else:
+        chain = get_query_chain()
+
+    answer = await chain.ainvoke({"context": context, "question": effective_question})
 
     return {
         "answer": answer,

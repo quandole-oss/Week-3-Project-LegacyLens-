@@ -5,8 +5,17 @@ from __future__ import annotations
 from backend.app.retrieval.search import SearchResult
 
 
-def assemble_context(results: list[SearchResult], max_chunks: int = 10) -> str:
-    """Assemble search results into a context string for the LLM."""
+def assemble_context(
+    results: list[SearchResult],
+    max_chunks: int = 3,
+    trim_after_rank: int = 3,
+    trim_char_limit: int = 800,
+) -> str:
+    """Assemble search results into a context string for the LLM.
+
+    Ranks 1 through trim_after_rank get full text.
+    Later ranks get header + first trim_char_limit chars + truncation marker.
+    """
     context_parts = []
 
     for i, result in enumerate(results[:max_chunks]):
@@ -16,7 +25,13 @@ def assemble_context(results: list[SearchResult], max_chunks: int = 10) -> str:
             f"[{result.routine_type}: {result.routine_name}] "
             f"(relevance: {result.score:.3f}) ---"
         )
-        context_parts.append(f"{header}\n{result.text}")
+        if i < trim_after_rank:
+            context_parts.append(f"{header}\n{result.text}")
+        else:
+            trimmed = result.text[:trim_char_limit]
+            if len(result.text) > trim_char_limit:
+                trimmed += "\n... [truncated]"
+            context_parts.append(f"{header}\n{trimmed}")
 
     return "\n\n".join(context_parts)
 

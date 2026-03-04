@@ -4,6 +4,35 @@ All notable changes to this project are documented here. Format follows [Keep a 
 
 ---
 
+## [0.5.0] - 2026-03-04
+
+Performance optimization via config defaults, verbosity profiles, and RAG context trimming.
+
+### Added
+
+- **Verbosity Profiles** (`backend/app/config.py`): `Verbosity` enum (SUCCINCT, CONCISE, REGULAR, DETAILED) and `VerbosityProfile` dataclass. Each profile controls `max_tokens`, `generation_model`, `use_query_expansion`, `use_reranker`, `reranker_initial_top_k`, `reranker_final_top_k`, `max_chunks`, `trim_after_rank`, `trim_char_limit`, and `prompt_suffix`
+- **Profile-Driven Generation** (`backend/app/generation/llm.py`): `get_llm()` gains `model_override` and `max_tokens_override` params. `stream_query_response()` and `generate_answer()` accept optional `VerbosityProfile` to control context assembly, model selection, token limits, and prompt suffix
+- **RAG Context Trimming** (`backend/app/retrieval/context.py`): `assemble_context()` gains `trim_after_rank` and `trim_char_limit` params. Top-ranked chunks (1 through `trim_after_rank`) get full text; later chunks get header + first 800 chars + `"... [truncated]"`. Reduces LLM prefill by ~200-500ms
+- **Verbosity API Field** (`backend/app/main.py`): `QueryRequest.verbosity` (default `"regular"`) — backward compatible. `resolve_profile()` maps string to profile. Both `/api/query` and `/api/smart-query` use profile-driven expansion, reranking, and generation
+- **VerbositySelector** (`frontend/src/components/VerbositySelector.tsx`): 4 toggle buttons (SUCCINCT | CONCISE | REGULAR | DETAILED) in retro terminal style matching TabBar. Amber highlight for active selection, placed below QueryInput
+- **Verbosity in API** (`frontend/src/api.ts`): `streamQuery()` gains `verbosity` param, included in POST body
+
+### Changed
+
+- **Config Defaults** (`backend/app/config.py`): `use_reranker` default `True` → `False` (saves ~1-2s per query); `reranker_initial_top_k` default `20` → `10`
+- **Context Default** (`backend/app/retrieval/context.py`): `max_chunks` default `10` → `3` (less context = faster generation)
+- **Token Limit** (`backend/app/generation/llm.py`): `max_tokens` default `4096` → `2048`
+- **AnswerPanel** (`frontend/src/components/AnswerPanel.tsx`): Wrapped with `React.memo` to prevent unnecessary re-renders during streaming
+
+### Performance
+
+- Succinct mode (Haiku, 512 tokens, no expansion/reranking): target ~1s
+- Regular mode (Sonnet, 2048 tokens, expansion + reranking): target ~2-3s
+- Detailed mode (Sonnet, 4096 tokens, full pipeline): target ~4s+
+- Config defaults alone (reranker off, fewer chunks, lower max_tokens) expected to drop baseline latency from ~3-5s to ~1.5-2.5s
+
+---
+
 ## [0.4.0] - 2026-03-02
 
 Performance improvements, evaluation tooling, and UI polish.

@@ -19,7 +19,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-from backend.app.config import get_settings
+from backend.app.config import get_settings, Verbosity, VERBOSITY_PROFILES
 from backend.app.retrieval.search import CodeSearcher
 from backend.app.retrieval.reranker import rerank_results
 from backend.app.retrieval.query_expansion import expand_query
@@ -96,6 +96,7 @@ class QueryRequest(BaseModel):
     question: str
     top_k: int = 10
     stream: bool = True
+    verbosity: str = "regular"
 
 
 class SearchRequest(BaseModel):
@@ -106,6 +107,15 @@ class SearchRequest(BaseModel):
 class FeatureRequest(BaseModel):
     query: str
     top_k: int = 5
+
+
+def resolve_profile(verbosity_str: str):
+    """Resolve a verbosity string to a VerbosityProfile."""
+    try:
+        level = Verbosity(verbosity_str.lower())
+    except ValueError:
+        level = Verbosity.REGULAR
+    return VERBOSITY_PROFILES[level]
 
 
 # --- Routes ---
@@ -124,20 +134,21 @@ async def health():
 async def query_code(request: QueryRequest):
     """Ask a question about the LAPACK codebase. Supports streaming."""
     searcher = get_searcher()
+    profile = resolve_profile(request.verbosity)
 
     # Optionally expand the query with Fortran-specific terms
     search_query = request.question
-    if settings.use_query_expansion:
+    if profile.use_query_expansion:
         search_query = expand_query(request.question)
 
     # Optionally re-rank results with Claude Haiku for higher quality
     prefetched = None
-    if settings.use_reranker:
+    if profile.use_reranker:
         raw_results = searcher.search(
-            search_query, top_k=settings.reranker_initial_top_k
+            search_query, top_k=profile.reranker_initial_top_k
         )
         prefetched = await rerank_results(
-            request.question, raw_results, final_top_k=settings.reranker_final_top_k
+            request.question, raw_results, final_top_k=profile.reranker_final_top_k
         )
 
     if request.stream:
@@ -145,6 +156,7 @@ async def query_code(request: QueryRequest):
             stream_query_response(
                 request.question, searcher, request.top_k,
                 prefetched_results=prefetched,
+                profile=profile,
             ),
             media_type="text/event-stream",
             headers={
@@ -157,6 +169,7 @@ async def query_code(request: QueryRequest):
         result = await generate_answer(
             request.question, searcher, request.top_k,
             prefetched_results=prefetched,
+            profile=profile,
         )
         return result
 
@@ -165,6 +178,7 @@ async def query_code(request: QueryRequest):
 async def smart_query(request: QueryRequest):
     """Auto-detect intent and route to the best handler."""
     searcher = get_searcher()
+    profile = resolve_profile(request.verbosity)
 
     detected_intent = "query"
     if settings.use_intent_detection:
@@ -181,7 +195,7 @@ async def smart_query(request: QueryRequest):
 
     if detected_intent == "search":
         search_query = request.question
-        if settings.use_query_expansion:
+        if profile.use_query_expansion:
             search_query = expand_query(request.question)
         results = searcher.search(search_query, top_k=request.top_k)
         return {
@@ -198,20 +212,21 @@ async def smart_query(request: QueryRequest):
             headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
         )
 
-    # Default: use the standard query pipeline with expansion + reranking
+    # Default: use the standard query pipeline with profile-driven settings
     search_query = request.question
-    if settings.use_query_expansion:
+    if profile.use_query_expansion:
         search_query = expand_query(request.question)
     prefetched = None
-    if settings.use_reranker:
-        raw_results = searcher.search(search_query, top_k=settings.reranker_initial_top_k)
+    if profile.use_reranker:
+        raw_results = searcher.search(search_query, top_k=profile.reranker_initial_top_k)
         prefetched = await rerank_results(
-            request.question, raw_results, final_top_k=settings.reranker_final_top_k
+            request.question, raw_results, final_top_k=profile.reranker_final_top_k
         )
     return StreamingResponse(
         stream_query_response(
             request.question, searcher, request.top_k,
             prefetched_results=prefetched,
+            profile=profile,
         ),
         media_type="text/event-stream",
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},

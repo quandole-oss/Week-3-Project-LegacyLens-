@@ -1,3 +1,4 @@
+import React from "react";
 import ReactMarkdown from "react-markdown";
 import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
 import fortran from "react-syntax-highlighter/dist/esm/languages/hljs/fortran";
@@ -10,7 +11,7 @@ interface Props {
   isStreaming: boolean;
 }
 
-export default function AnswerPanel({ answer, isStreaming }: Props) {
+const AnswerPanel = React.memo(function AnswerPanel({ answer, isStreaming }: Props) {
   if (!answer) return null;
 
   return (
@@ -57,4 +58,6 @@ export default function AnswerPanel({ answer, isStreaming }: Props) {
       </div>
     </div>
   );
-}
+});
+
+export default AnswerPanel;

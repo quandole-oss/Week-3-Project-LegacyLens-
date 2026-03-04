@@ -162,9 +162,23 @@
 - [x] Deployed backend update to Railway via `railway up`
 - [x] Verified warm query latency <3s (2.5s measured)
 
+## Performance Optimization & Verbosity Control (v0.5.0) — Completed
+
+- [x] Config defaults: `use_reranker=False` (saves ~1-2s), `reranker_initial_top_k=10`, `max_tokens=2048`, `max_chunks=3`
+- [x] Verbosity enum + profiles: SUCCINCT (Haiku/512tok), CONCISE (Sonnet/1024tok), REGULAR (Sonnet/2048tok), DETAILED (Sonnet/4096tok)
+- [x] Profile-driven pipeline: each verbosity level controls model, max_tokens, expansion, reranking, chunk count, trimming, and prompt suffix
+- [x] RAG context trimming: top-ranked chunks get full text, later chunks get header + first 800 chars + `[truncated]`
+- [x] `get_llm()` gains `model_override` + `max_tokens_override` params
+- [x] `stream_query_response()` + `generate_answer()` accept `VerbosityProfile` for profile-driven generation
+- [x] `QueryRequest.verbosity` field (default `"regular"`) — backward compatible
+- [x] Frontend: `VerbositySelector` component (4 toggle buttons, retro terminal style, amber highlight)
+- [x] Frontend: `streamQuery()` passes `verbosity` in POST body
+- [x] Frontend: `AnswerPanel` wrapped with `React.memo` to prevent unnecessary re-renders
+
 ## Remaining (Requires User Action)
 
 - [ ] Test all 6 tabs in browser UI (visual verification)
+- [ ] Test verbosity selector: confirm Succinct ~1s, Regular ~2-3s, Detailed ~4s+
 - [ ] Record demo video using `docs/demo-script.md` (3-5 min, QuickTime/OBS/Loom)
 - [ ] Post on X or LinkedIn using drafts from `docs/social-posts.md`, tag @GauntletAI
 - [ ] Push `.github/workflows/ci.yml` (requires GitHub token with `workflow` scope)

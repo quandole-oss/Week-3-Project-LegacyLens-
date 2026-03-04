@@ -80,11 +80,12 @@ export async function* streamQuery(
   endpoint: string,
   query: string,
   topK: number = 10,
+  verbosity: string = "regular",
 ): AsyncGenerator<StreamEvent> {
   const res = await fetch(`${API_URL}${endpoint}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ question: query, query, top_k: topK, stream: true }),
+    body: JSON.stringify({ question: query, query, top_k: topK, stream: true, verbosity }),
   });
 
   if (!res.ok) throw new Error(`Request failed: ${res.statusText}`);

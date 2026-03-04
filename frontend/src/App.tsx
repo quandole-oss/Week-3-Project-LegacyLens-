@@ -4,6 +4,8 @@ import TabBar from "./components/TabBar";
 import QueryInput from "./components/QueryInput";
 import AnswerPanel from "./components/AnswerPanel";
 import SourceCard from "./components/SourceCard";
+import VerbositySelector from "./components/VerbositySelector";
+import type { Verbosity } from "./components/VerbositySelector";
 import { AnswerSkeleton, SourceSkeleton } from "./components/Skeleton";
 import { streamQuery, searchCode } from "./api";
 import type { Source, SearchResult } from "./api";
@@ -33,6 +35,7 @@ const TAB_PLACEHOLDERS: Record<TabId, string> = {
 
 function App() {
   const [activeTab, setActiveTab] = useState<TabId>("query");
+  const [verbosity, setVerbosity] = useState<Verbosity>("regular");
   const [isLoading, setIsLoading] = useState(false);
   const [answer, setAnswer] = useState("");
   const [sources, setSources] = useState<Source[]>([]);
@@ -78,7 +81,7 @@ function App() {
         const endpoint = TAB_ENDPOINTS[activeTab];
         let fullAnswer = "";
 
-        for await (const event of streamQuery(endpoint, query)) {
+        for await (const event of streamQuery(endpoint, query, 10, verbosity)) {
           switch (event.type) {
             case "sources":
               setSources(event.data as Source[]);
@@ -117,7 +120,7 @@ function App() {
         setIsLoading(false);
       }
     },
-    [activeTab, scheduleAnswerUpdate]
+    [activeTab, verbosity, scheduleAnswerUpdate]
   );
 
   return (
@@ -131,6 +134,7 @@ function App() {
             isLoading={isLoading}
             placeholder={TAB_PLACEHOLDERS[activeTab]}
           />
+          <VerbositySelector value={verbosity} onChange={setVerbosity} />
 
           {error && (
             <div className="border border-amber text-amber px-3 py-2 font-mono uppercase crt-glow-amber">
