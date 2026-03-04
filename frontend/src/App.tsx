@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import Header from "./components/Header";
 import TabBar from "./components/TabBar";
 import QueryInput from "./components/QueryInput";
@@ -39,10 +39,30 @@ function App() {
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [error, setError] = useState<string | null>(null);
 
+  // Batch token updates to avoid re-rendering ReactMarkdown on every token
+  const pendingAnswerRef = useRef("");
+  const rafIdRef = useRef<number>(0);
+
+  const flushAnswer = useCallback(() => {
+    setAnswer(pendingAnswerRef.current);
+    rafIdRef.current = 0;
+  }, []);
+
+  const scheduleAnswerUpdate = useCallback(
+    (text: string) => {
+      pendingAnswerRef.current = text;
+      if (!rafIdRef.current) {
+        rafIdRef.current = requestAnimationFrame(flushAnswer);
+      }
+    },
+    [flushAnswer]
+  );
+
   const handleQuery = useCallback(
     async (query: string) => {
       setIsLoading(true);
       setAnswer("");
+      pendingAnswerRef.current = "";
       setSources([]);
       setSearchResults([]);
       setError(null);
@@ -65,13 +85,13 @@ function App() {
               break;
             case "token":
               fullAnswer += event.data as string;
-              setAnswer(fullAnswer);
+              scheduleAnswerUpdate(fullAnswer);
               break;
             case "patterns":
             case "graph":
               // For structured data, display as formatted JSON
               fullAnswer += "```json\n" + JSON.stringify(event.data, null, 2) + "\n```\n\n";
-              setAnswer(fullAnswer);
+              scheduleAnswerUpdate(fullAnswer);
               break;
             case "result":
               // Pattern search individual results
@@ -85,13 +105,19 @@ function App() {
               break;
           }
         }
+        // Flush any remaining buffered tokens after stream ends
+        if (rafIdRef.current) {
+          cancelAnimationFrame(rafIdRef.current);
+          rafIdRef.current = 0;
+        }
+        setAnswer(fullAnswer);
       } catch (err) {
         setError(err instanceof Error ? err.message : "An error occurred");
       } finally {
         setIsLoading(false);
       }
     },
-    [activeTab]
+    [activeTab, scheduleAnswerUpdate]
   );
 
   return (
